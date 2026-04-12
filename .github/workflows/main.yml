@@ -3,6 +3,7 @@ name: Build and Check CI
 on: [push, pull_request]
 
 jobs:
+
   formatting-check:
     name: Formatting Check
     runs-on: ubuntu-latest
@@ -37,13 +38,13 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha
       - name: Build vkQuake
-        run: docker run --rm --privileged -e VERSION=${GITHUB_SHA::8} -v "$PWD:/usr/src/vkQuake" build-vkquake /usr/src/vkQuake/Packaging/Appimage/run-in-docker.sh
+        run: docker run --rm --privileged -e VERSION=${GITHUB_SHA::8} -v "$PWD:/usr/src/vkQuake" build-vkquake /usr/src/vkQuake/Packaging/AppImage/run-in-docker.sh
       - name: Upload vkQuake
         uses: actions/upload-artifact@v7
         with:
           name: vkQuake archive
           path: Packaging/AppImage/*.tar.gz
-  
+
   build-macos:
     name: Build macOS
     runs-on: macos-14
@@ -61,7 +62,7 @@ jobs:
         run: |
           dsymutil build/vkquake -o build/vkquake.dSYM
           du -sh build/vkquake build/vkquake.dSYM
-          dwarfdump --uid build/vkquake build/vkquake.dSYM
+          dwarfdump --uuid build/vkquake build/vkquake.dSYM
       - name: Upload vkQuake
         uses: actions/upload-artifact@v7
         with:
@@ -87,7 +88,7 @@ jobs:
             msys-env: mingw-w64-x86_64
             makefile: Makefile.w64
             install_extra: ""
-            
+
           - name: Windows (clangarm64)
             os: windows-11-arm
             shell: 'msys2 {0}'
@@ -128,7 +129,7 @@ jobs:
           path: |
             Quake/*.exe
             Quake/*.dll
-  
+
   build-windows-msvc:
     name: Build Windows (MSVC)
     runs-on: windows-2022
@@ -153,9 +154,9 @@ jobs:
             '-property:Platform=${{ matrix.platform }}', `
             '-maxcpucount', `
             '-verbosity:minimal' `
-            )
-            & $msbuild Windows\VisualStudio\vkquake.sln $options
-            if (-not $?) { throw "Build failed" }
+          )
+          & $msbuild Windows\VisualStudio\vkquake.sln $options
+          if (-not $?) { throw "Build failed" }
       - name: Upload vkQuake
         uses: actions/upload-artifact@v7
         with:
